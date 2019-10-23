@@ -1,0 +1,26 @@
+{
+	"name": "my-pastel-cli",
+	"version": "0.0.0",
+	"license": "MIT",
+	"bin": "./build/cli.js",
+	"engines": {
+		"node": ">=8"
+	},
+	"scripts": {
+		"dev": "pastel dev",
+		"build": "pastel build",
+		"prepare": "pastel build"
+	},
+	"files": [
+		"build"
+	],
+	"dependencies": {
+		"ink": "^2.5.0",
+		"ink-table": "^2.0.1",
+		"ink-text-input": "^3.2.1",
+		"pastel": "^1.0.3",
+		"prompt": "^1.0.0",
+		"prop-types": "^15.7.2",
+		"react": "^16.10.2"
+	}
+}
