@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Text, Box } from "ink";
 import Table from "ink-table";
+import axios from "axios";
+
 import TextInput from "ink-text-input";
+import { API_KEY } from "../configs";
 
 const foods = [
 	{
@@ -56,12 +59,25 @@ const MenuList = ({ list }) => {
 	const [name, setName] = useState("");
 	const [step, setStep] = useState(0);
 	const [cart, setCart] = useState(cartDefault);
+	const [listFood, setListFood] = useState({});
 
-	const handleSubmitFoodName = (data, n) => {
-		const input = parseInt(n);
-		const numberRange = data.map(i => i.id);
+	useEffect(() => {
+		async function fetchData() {
+			// You can await here
+			const response = await axios(
+				"https://sheets.googleapis.com/v4/spreadsheets/1ZjzZKCMOFp5YncC3yZLLwFW4sER6p5fkR0rA5KvhHrY/values/Sheet1?key=AIzaSyCccptxVWHp1Mf4BGCC33m1SzgwU14BRD4"
+			);
+			// ...
+			setListFood(response.data.values[1]);
+		}
+		fetchData();
+	}, []);
+
+	const handleSubmitFoodName = (data, orderNumber) => {
+		const input = parseInt(orderNumber);
+		console.log(orderNumber);
+		const numberRange = data.map(food => food.id);
 		if (input === 0 || numberRange.includes(input)) {
-			console.log("Going to next step " + (step + 1));
 			setStep(step + 1);
 		} else {
 			console.log("number invalid");
@@ -70,15 +86,21 @@ const MenuList = ({ list }) => {
 		}
 	};
 
-	const foodMapping = (orderNumber, orderQuantity = 1, listFood, foodType) => {
-		const food = listFood.find(food => food.id === orderNumber);
+	const addFoodToCart = (
+		orderNumber,
+		orderQuantity = 1,
+		listFood,
+		foodType
+	) => {
+		const food = listFood.find(food => food.id == orderNumber);
 		food.value = orderQuantity;
 
 		if (foodType === "main") setCart(cart, cart.main.push(food));
 		else if (foodType === "extras") setCart(cart, cart.extras.push(food));
-		else setCart(cart, cart.extras.push(food));
+		else setCart(cart, cart.drinks.push(food));
 
 		console.log(cart);
+
 		setOrderNumber("");
 		setOrderQuantity("");
 		setStep(step + 1);
@@ -108,7 +130,9 @@ const MenuList = ({ list }) => {
 						<TextInput
 							value={orderQuantity}
 							onChange={e => setOrderQuantity(e)}
-							onSubmit={() => foodMapping(1, orderQuantity, main, "main")}
+							onSubmit={() =>
+								addFoodToCart(orderNumber, orderQuantity, main, "main")
+							}
 						/>
 					</Box>
 				</>
@@ -137,13 +161,43 @@ const MenuList = ({ list }) => {
 							value={orderQuantity}
 							onChange={e => setOrderQuantity(e)}
 							onSubmit={() =>
-								foodMapping(orderNumber, orderQuantity, main, "main")
+								addFoodToCart(orderNumber, orderQuantity, extras, "extras")
 							}
 						/>
 					</Box>
 				</>
 			);
 		case 5:
+			return (
+				<>
+					<Text> Pick your drinks: </Text>
+					<Table data={drinks} />
+					<Box>
+						<Box marginRight={1}>Pick number:</Box>
+						<TextInput
+							value={orderNumber}
+							onChange={e => setOrderNumber(e)}
+							onSubmit={() => handleSubmitFoodName(drinks, orderNumber)}
+						/>
+					</Box>
+				</>
+			);
+		case 6:
+			return (
+				<>
+					<Box>
+						<Box marginRight={1}>Quantity: </Box>
+						<TextInput
+							value={orderQuantity}
+							onChange={e => setOrderQuantity(e)}
+							onSubmit={() =>
+								addFoodToCart(orderNumber, orderQuantity, drinks, "drinks")
+							}
+						/>
+					</Box>
+				</>
+			);
+		case 7:
 			return <Text>Done</Text>;
 		default:
 			return (

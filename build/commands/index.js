@@ -117,7 +117,16 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"index.js":[function(require,module,exports) {
+})({"../configs/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.API_KEY = void 0;
+const API_KEY = "AIzaSyCccptxVWHp1Mf4BGCC33m1SzgwU14BRD4";
+exports.API_KEY = API_KEY;
+},{}],"index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -133,7 +142,11 @@ var _ink = require("ink");
 
 var _inkTable = _interopRequireDefault(require("ink-table"));
 
+var _axios = _interopRequireDefault(require("axios"));
+
 var _inkTextInput = _interopRequireDefault(require("ink-text-input"));
+
+var _configs = require("../configs");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -195,13 +208,24 @@ const MenuList = ({
   const [name, setName] = (0, _react.useState)("");
   const [step, setStep] = (0, _react.useState)(0);
   const [cart, setCart] = (0, _react.useState)(cartDefault);
+  const [listFood, setListFood] = (0, _react.useState)({});
+  (0, _react.useEffect)(() => {
+    async function fetchData() {
+      // You can await here
+      const response = await (0, _axios.default)("https://sheets.googleapis.com/v4/spreadsheets/1ZjzZKCMOFp5YncC3yZLLwFW4sER6p5fkR0rA5KvhHrY/values/Sheet1?key=AIzaSyCccptxVWHp1Mf4BGCC33m1SzgwU14BRD4"); // ...
 
-  const handleSubmitFoodName = (data, n) => {
-    const input = parseInt(n);
-    const numberRange = data.map(i => i.id);
+      setListFood(response.data.values[1]);
+    }
+
+    fetchData();
+  }, []);
+
+  const handleSubmitFoodName = (data, orderNumber) => {
+    const input = parseInt(orderNumber);
+    console.log(orderNumber);
+    const numberRange = data.map(food => food.id);
 
     if (input === 0 || numberRange.includes(input)) {
-      console.log("Going to next step " + (step + 1));
       setStep(step + 1);
     } else {
       console.log("number invalid");
@@ -210,10 +234,10 @@ const MenuList = ({
     }
   };
 
-  const foodMapping = (orderNumber, orderQuantity = 1, listFood, foodType) => {
-    const food = listFood.find(food => food.id === orderNumber);
+  const addFoodToCart = (orderNumber, orderQuantity = 1, listFood, foodType) => {
+    const food = listFood.find(food => food.id == orderNumber);
     food.value = orderQuantity;
-    if (foodType === "main") setCart(cart, cart.main.push(food));else if (foodType === "extras") setCart(cart, cart.extras.push(food));else setCart(cart, cart.extras.push(food));
+    if (foodType === "main") setCart(cart, cart.main.push(food));else if (foodType === "extras") setCart(cart, cart.extras.push(food));else setCart(cart, cart.drinks.push(food));
     console.log(cart);
     setOrderNumber("");
     setOrderQuantity("");
@@ -238,7 +262,7 @@ const MenuList = ({
       }, "Quantity: "), _react.default.createElement(_inkTextInput.default, {
         value: orderQuantity,
         onChange: e => setOrderQuantity(e),
-        onSubmit: () => foodMapping(1, orderQuantity, main, "main")
+        onSubmit: () => addFoodToCart(orderNumber, orderQuantity, main, "main")
       })));
 
     case 3:
@@ -258,10 +282,30 @@ const MenuList = ({
       }, "Quantity: "), _react.default.createElement(_inkTextInput.default, {
         value: orderQuantity,
         onChange: e => setOrderQuantity(e),
-        onSubmit: () => foodMapping(orderNumber, orderQuantity, main, "main")
+        onSubmit: () => addFoodToCart(orderNumber, orderQuantity, extras, "extras")
       })));
 
     case 5:
+      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, " Pick your drinks: "), _react.default.createElement(_inkTable.default, {
+        data: drinks
+      }), _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
+        marginRight: 1
+      }, "Pick number:"), _react.default.createElement(_inkTextInput.default, {
+        value: orderNumber,
+        onChange: e => setOrderNumber(e),
+        onSubmit: () => handleSubmitFoodName(drinks, orderNumber)
+      })));
+
+    case 6:
+      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
+        marginRight: 1
+      }, "Quantity: "), _react.default.createElement(_inkTextInput.default, {
+        value: orderQuantity,
+        onChange: e => setOrderQuantity(e),
+        onSubmit: () => addFoodToCart(orderNumber, orderQuantity, drinks, "drinks")
+      })));
+
+    case 7:
       return _react.default.createElement(_ink.Text, null, "Done");
 
     default:
@@ -277,5 +321,5 @@ const MenuList = ({
 
 var _default = MenuList;
 exports.default = _default;
-},{}]},{},["index.js"], null)
+},{"../configs":"../configs/index.js"}]},{},["index.js"], null)
 //# sourceMappingURL=/index.js.map
