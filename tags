@@ -617,6 +617,7 @@ caniuse-lite	package-lock.json	/^				"caniuse-lite": "^1.0.30000999",$/;"	s	obje
 caniuse-lite	package-lock.json	/^		"caniuse-lite": {$/;"	o	object:dependencies
 cardinal	package-lock.json	/^				"cardinal": "^2.1.1",$/;"	s	object:dependencies.pastel.requires
 cardinal	package-lock.json	/^		"cardinal": {$/;"	o	object:dependencies
+cartDefault	commands/index.js	/^var cartDefault = {$/;"	c
 caseless	package-lock.json	/^				"caseless": "~0.12.0",$/;"	s	object:dependencies.request.requires
 caseless	package-lock.json	/^		"caseless": {$/;"	o	object:dependencies
 chalk	package-lock.json	/^						"chalk": "^1.1.3",$/;"	s	object:dependencies.css-modules-loader-core.dependencies.postcss.requires
@@ -995,6 +996,7 @@ dotenv	package-lock.json	/^				"dotenv": "^5.0.0",$/;"	s	object:dependencies.par
 dotenv	package-lock.json	/^		"dotenv": {$/;"	o	object:dependencies
 dotenv-expand	package-lock.json	/^				"dotenv-expand": "^5.1.0",$/;"	s	object:dependencies.parcel-bundler.requires
 dotenv-expand	package-lock.json	/^		"dotenv-expand": {$/;"	o	object:dependencies
+drinks	commands/index.js	/^	drinks: []$/;"	p	class:cartDefault
 drinks	commands/index.js	/^const drinks = [{ id: 1, name: "Nuoc dua" }];$/;"	C
 duplexer2	package-lock.json	/^				"duplexer2": "~0.1.4",$/;"	s	object:dependencies.static-module.requires
 duplexer2	package-lock.json	/^		"duplexer2": {$/;"	o	object:dependencies
@@ -1097,6 +1099,7 @@ extend-shallow	package-lock.json	/^				"extend-shallow": {$/;"	o	object:dependen
 extend-shallow	package-lock.json	/^		"extend-shallow": {$/;"	o	object:dependencies
 extglob	package-lock.json	/^				"extglob": "^2.0.4",$/;"	s	object:dependencies.micromatch.requires
 extglob	package-lock.json	/^		"extglob": {$/;"	o	object:dependencies
+extras	commands/index.js	/^	extras: [],$/;"	p	class:cartDefault
 extras	commands/index.js	/^const extras = [$/;"	C
 extsprintf	package-lock.json	/^				"extsprintf": "1.3.0",$/;"	s	object:dependencies.jsprim.requires
 extsprintf	package-lock.json	/^				"extsprintf": "^1.2.0"$/;"	s	object:dependencies.verror.requires
@@ -1126,6 +1129,8 @@ find-up	package-lock.json	/^				"find-up": "^3.0.0"$/;"	s	object:dependencies.pk
 find-up	package-lock.json	/^				"find-up": "^3.0.0",$/;"	s	object:dependencies.read-pkg-up.requires
 find-up	package-lock.json	/^				"find-up": "^3.0.0",$/;"	s	object:dependencies.yargs.requires
 find-up	package-lock.json	/^		"find-up": {$/;"	o	object:dependencies
+food	commands/index.js	/^		const food = listFood.find(food => food.id === orderNumber);$/;"	C
+foodMapping	commands/index.js	/^	const foodMapping = (orderNumber, orderQuantity = 1, listFood, foodType) => {$/;"	C
 foods	commands/index.js	/^const foods = [$/;"	C
 for-in	package-lock.json	/^				"for-in": "^1.0.2",$/;"	s	object:dependencies.mixin-deep.requires
 for-in	package-lock.json	/^		"for-in": {$/;"	o	object:dependencies
@@ -1192,7 +1197,6 @@ graceful-fs	package-lock.json	/^		"graceful-fs": {$/;"	o	object:dependencies
 grapheme-breaker	package-lock.json	/^				"grapheme-breaker": "^0.3.2",$/;"	s	object:dependencies.@parcel/logger.requires
 grapheme-breaker	package-lock.json	/^		"grapheme-breaker": {$/;"	o	object:dependencies
 handleSubmitFoodName	commands/index.js	/^	const handleSubmitFoodName = (data, n) => {$/;"	C
-handleSubmitQuantity	commands/index.js	/^	const handleSubmitQuantity = (data, n) => {$/;"	C
 har-schema	package-lock.json	/^				"har-schema": "^2.0.0"$/;"	s	object:dependencies.har-validator.requires
 har-schema	package-lock.json	/^		"har-schema": {$/;"	o	object:dependencies
 har-validator	package-lock.json	/^				"har-validator": "~5.1.0",$/;"	s	object:dependencies.request.requires
@@ -2451,6 +2455,7 @@ loose-envify	package-lock.json	/^				"loose-envify": "^1.4.0",$/;"	s	object:depe
 loose-envify	package-lock.json	/^		"loose-envify": {$/;"	o	object:dependencies
 magic-string	package-lock.json	/^				"magic-string": "^0.22.4",$/;"	s	object:dependencies.static-module.requires
 magic-string	package-lock.json	/^		"magic-string": {$/;"	o	object:dependencies
+main	commands/index.js	/^	main: [],$/;"	p	class:cartDefault
 main	commands/index.js	/^const main = [$/;"	C
 make-dir	package-lock.json	/^				"make-dir": "^3.0.0",$/;"	s	object:dependencies.pastel.requires
 make-dir	package-lock.json	/^		"make-dir": {$/;"	o	object:dependencies
@@ -2548,6 +2553,7 @@ ms	package-lock.json	/^		"ms": {$/;"	o	object:dependencies
 mute-stream	package-lock.json	/^				"mute-stream": "~0.0.4"$/;"	s	object:dependencies.read.requires
 mute-stream	package-lock.json	/^		"mute-stream": {$/;"	o	object:dependencies
 my-pastel-cli	readme.md	/^# my-pastel-cli$/;"	c
+name	commands/index.js	/^	name: "",$/;"	p	class:cartDefault
 name	package-lock.json	/^	"name": "my-pastel-cli",$/;"	s
 name	package.json	/^	"name": "lunch",$/;"	s
 nan	package-lock.json	/^				"nan": "^2.12.1",$/;"	s	object:dependencies.fsevents.requires
@@ -4548,7 +4554,7 @@ set-blocking	package-lock.json	/^		"set-blocking": {$/;"	o	object:dependencies
 set-value	package-lock.json	/^				"set-value": "^2.0.0",$/;"	s	object:dependencies.cache-base.requires
 set-value	package-lock.json	/^				"set-value": "^2.0.1"$/;"	s	object:dependencies.union-value.requires
 set-value	package-lock.json	/^		"set-value": {$/;"	o	object:dependencies
-setCart	commands/index.js	/^	const [cart, setCart] = useState([]);$/;"	C
+setCart	commands/index.js	/^	const [cart, setCart] = useState(cartDefault);$/;"	C
 setName	commands/index.js	/^	const [name, setName] = useState("");$/;"	C
 setOrderNumber	commands/index.js	/^	const [orderNumber, setOrderNumber] = useState("");$/;"	C
 setOrderQuantity	commands/index.js	/^	const [orderQuantity, setOrderQuantity] = useState("");$/;"	C

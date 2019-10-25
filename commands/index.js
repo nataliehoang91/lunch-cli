@@ -4,12 +4,6 @@ import { Text, Box } from "ink";
 import Table from "ink-table";
 import TextInput from "ink-text-input";
 
-const main = [
-	{ id: 1, name: "sườn non nướng sữa" },
-	{ id: 2, name: "Thịt kho trứng cút" },
-	{ id: 3, name: "thịt bò xào cải chua" }
-];
-
 const foods = [
 	{
 		name: "nguyen",
@@ -34,6 +28,12 @@ const foods = [
 	}
 ];
 
+const main = [
+	{ id: 1, name: "sườn non nướng sữa" },
+	{ id: 2, name: "Thịt kho trứng cút" },
+	{ id: 3, name: "thịt bò xào cải chua" }
+];
+
 const extras = [
 	{ id: 1, name: "sườn thêm" },
 	{ id: 2, name: "thịt kho thêm" },
@@ -42,13 +42,20 @@ const extras = [
 
 const drinks = [{ id: 1, name: "Nuoc dua" }];
 
+var cartDefault = {
+	name: "",
+	main: [],
+	extras: [],
+	drinks: []
+};
+
 ///List all Menu for today
 const MenuList = ({ list }) => {
 	const [orderNumber, setOrderNumber] = useState("");
 	const [orderQuantity, setOrderQuantity] = useState("");
 	const [name, setName] = useState("");
 	const [step, setStep] = useState(0);
-	const [cart, setCart] = useState([]);
+	const [cart, setCart] = useState(cartDefault);
 
 	const handleSubmitFoodName = (data, n) => {
 		const input = parseInt(n);
@@ -56,19 +63,25 @@ const MenuList = ({ list }) => {
 		if (input === 0 || numberRange.includes(input)) {
 			console.log("Going to next step " + (step + 1));
 			setStep(step + 1);
-			setOrderNumber("");
 		} else {
 			console.log("number invalid");
 			console.log(numberRange);
 			console.log(input);
 		}
 	};
-	const handleSubmitQuantity = (data, n) => {
-		const input = parseInt(n);
-		const numberRange = data.map(i => i.id);
-		console.log("Going to next step " + (step + 1));
-		setStep(step + 1);
+
+	const foodMapping = (orderNumber, orderQuantity = 1, listFood, foodType) => {
+		const food = listFood.find(food => food.id === orderNumber);
+		food.value = orderQuantity;
+
+		if (foodType === "main") setCart(cart, cart.main.push(food));
+		else if (foodType === "extras") setCart(cart, cart.extras.push(food));
+		else setCart(cart, cart.extras.push(food));
+
+		console.log(cart);
 		setOrderNumber("");
+		setOrderQuantity("");
+		setStep(step + 1);
 	};
 
 	switch (step) {
@@ -78,7 +91,7 @@ const MenuList = ({ list }) => {
 					<Text>Pick ur main</Text>
 					<Table data={main} />
 					<Box>
-						<Box marginRight={1}>Pick number:</Box>
+						<Box marginRight={1}>Pick number: </Box>
 						<TextInput
 							value={orderNumber}
 							onChange={e => setOrderNumber(e)}
@@ -93,9 +106,9 @@ const MenuList = ({ list }) => {
 					<Box>
 						<Box marginRight={1}>Quantity: </Box>
 						<TextInput
-							value={orderNumber}
-							onChange={e => setOrderNumber(e)}
-							onSubmit={() => handleSubmitFoodName(main, orderNumber)}
+							value={orderQuantity}
+							onChange={e => setOrderQuantity(e)}
+							onSubmit={() => foodMapping(1, orderQuantity, main, "main")}
 						/>
 					</Box>
 				</>
@@ -121,9 +134,11 @@ const MenuList = ({ list }) => {
 					<Box>
 						<Box marginRight={1}>Quantity: </Box>
 						<TextInput
-							value={orderNumber}
-							onChange={e => setOrderNumber(e)}
-							onSubmit={() => handleSubmitFoodName(main, orderNumber)}
+							value={orderQuantity}
+							onChange={e => setOrderQuantity(e)}
+							onSubmit={() =>
+								foodMapping(orderNumber, orderQuantity, main, "main")
+							}
 						/>
 					</Box>
 				</>

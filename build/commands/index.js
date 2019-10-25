@@ -141,16 +141,6 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; if (obj != null) { var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-const main = [{
-  id: 1,
-  name: "sườn non nướng sữa"
-}, {
-  id: 2,
-  name: "Thịt kho trứng cút"
-}, {
-  id: 3,
-  name: "thịt bò xào cải chua"
-}];
 const foods = [{
   name: "nguyen",
   main: [{
@@ -166,6 +156,16 @@ const foods = [{
     value: 2
   }]
 }];
+const main = [{
+  id: 1,
+  name: "sườn non nướng sữa"
+}, {
+  id: 2,
+  name: "Thịt kho trứng cút"
+}, {
+  id: 3,
+  name: "thịt bò xào cải chua"
+}];
 const extras = [{
   id: 1,
   name: "sườn thêm"
@@ -179,7 +179,13 @@ const extras = [{
 const drinks = [{
   id: 1,
   name: "Nuoc dua"
-}]; ///List all Menu for today
+}];
+var cartDefault = {
+  name: "",
+  main: [],
+  extras: [],
+  drinks: []
+}; ///List all Menu for today
 
 const MenuList = ({
   list
@@ -188,7 +194,7 @@ const MenuList = ({
   const [orderQuantity, setOrderQuantity] = (0, _react.useState)("");
   const [name, setName] = (0, _react.useState)("");
   const [step, setStep] = (0, _react.useState)(0);
-  const [cart, setCart] = (0, _react.useState)([]);
+  const [cart, setCart] = (0, _react.useState)(cartDefault);
 
   const handleSubmitFoodName = (data, n) => {
     const input = parseInt(n);
@@ -197,7 +203,6 @@ const MenuList = ({
     if (input === 0 || numberRange.includes(input)) {
       console.log("Going to next step " + (step + 1));
       setStep(step + 1);
-      setOrderNumber("");
     } else {
       console.log("number invalid");
       console.log(numberRange);
@@ -205,12 +210,14 @@ const MenuList = ({
     }
   };
 
-  const handleSubmitQuantity = (data, n) => {
-    const input = parseInt(n);
-    const numberRange = data.map(i => i.id);
-    console.log("Going to next step " + (step + 1));
-    setStep(step + 1);
+  const foodMapping = (orderNumber, orderQuantity = 1, listFood, foodType) => {
+    const food = listFood.find(food => food.id === orderNumber);
+    food.value = orderQuantity;
+    if (foodType === "main") setCart(cart, cart.main.push(food));else if (foodType === "extras") setCart(cart, cart.extras.push(food));else setCart(cart, cart.extras.push(food));
+    console.log(cart);
     setOrderNumber("");
+    setOrderQuantity("");
+    setStep(step + 1);
   };
 
   switch (step) {
@@ -219,7 +226,7 @@ const MenuList = ({
         data: main
       }), _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
         marginRight: 1
-      }, "Pick number:"), _react.default.createElement(_inkTextInput.default, {
+      }, "Pick number: "), _react.default.createElement(_inkTextInput.default, {
         value: orderNumber,
         onChange: e => setOrderNumber(e),
         onSubmit: () => handleSubmitFoodName(main, orderNumber)
@@ -229,9 +236,9 @@ const MenuList = ({
       return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
         marginRight: 1
       }, "Quantity: "), _react.default.createElement(_inkTextInput.default, {
-        value: orderNumber,
-        onChange: e => setOrderNumber(e),
-        onSubmit: () => handleSubmitFoodName(main, orderNumber)
+        value: orderQuantity,
+        onChange: e => setOrderQuantity(e),
+        onSubmit: () => foodMapping(1, orderQuantity, main, "main")
       })));
 
     case 3:
@@ -249,9 +256,9 @@ const MenuList = ({
       return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
         marginRight: 1
       }, "Quantity: "), _react.default.createElement(_inkTextInput.default, {
-        value: orderNumber,
-        onChange: e => setOrderNumber(e),
-        onSubmit: () => handleSubmitFoodName(main, orderNumber)
+        value: orderQuantity,
+        onChange: e => setOrderQuantity(e),
+        onSubmit: () => foodMapping(orderNumber, orderQuantity, main, "main")
       })));
 
     case 5:
