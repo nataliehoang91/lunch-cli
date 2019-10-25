@@ -7,117 +7,69 @@ import axios from "axios";
 import TextInput from "ink-text-input";
 import { API_KEY } from "../configs";
 
-const foods = [
-	{
-		name: "nguyen",
-		main: [
-			{
-				name: "suon heo",
-				value: 3
-			}
-		],
-		extras: [
-			{
-				name: "suon bo",
-				value: 2
-			}
-		],
-		drinks: [
-			{
-				name: "nuoc dua",
-				value: 2
-			}
-		]
-	}
-];
+const requestBody = {
+	range: "Sheet1",
+	majorDimension: "ROWS",
+	values: []
+};
 
-const main = [
+const foods = [
 	{ id: 1, name: "sườn non nướng sữa" },
 	{ id: 2, name: "Thịt kho trứng cút" },
-	{ id: 3, name: "thịt bò xào cải chua" }
+	{ id: 3, name: "thịt bò xào cải chua" },
+	{ id: 4, name: "sườn thêm" },
+	{ id: 5, name: "thịt kho thêm" },
+	{ id: 6, name: "bò thêm" },
+	{ id: 7, name: "Nuoc dua" }
 ];
-
-const extras = [
-	{ id: 1, name: "sườn thêm" },
-	{ id: 2, name: "thịt kho thêm" },
-	{ id: 3, name: "bò thêm" }
-];
-
-const drinks = [{ id: 1, name: "Nuoc dua" }];
-
-var cartDefault = {
-	name: "",
-	main: [],
-	extras: [],
-	drinks: []
-};
 
 ///List all Menu for today
 const MenuList = ({ list }) => {
-	const [orderNumber, setOrderNumber] = useState("");
-	const [orderQuantity, setOrderQuantity] = useState("");
+	const [order, setOrder] = useState("");
+	const [cart, setCart] = useState([]);
 	const [name, setName] = useState("");
 	const [step, setStep] = useState(0);
-	const [cart, setCart] = useState(cartDefault);
 	const [listFood, setListFood] = useState({});
 
 	useEffect(() => {
 		async function fetchData() {
-			// You can await here
 			const response = await axios(
 				"https://sheets.googleapis.com/v4/spreadsheets/1ZjzZKCMOFp5YncC3yZLLwFW4sER6p5fkR0rA5KvhHrY/values/Sheet1?key=AIzaSyCccptxVWHp1Mf4BGCC33m1SzgwU14BRD4"
 			);
-			// ...
 			setListFood(response.data.values[1]);
+			setCart(Array(response.data.values[1].length).fill(""));
 		}
 		fetchData();
 	}, []);
 
-	const handleSubmitFoodName = (data, orderNumber) => {
-		const input = parseInt(orderNumber);
-		console.log(orderNumber);
+	const handleSubmitFood = (data, order) => {
+		const input = order
+			.trim()
+			.split(" ")
+			.map(i => parseInt(i));
 		const numberRange = data.map(food => food.id);
-		if (input === 0 || numberRange.includes(input)) {
+		if (input === 0 || numberRange.includes(input[0])) {
+			setCart(([input[0]] = input[1]));
 			setStep(step + 1);
+			//setOrder("");
 		} else {
 			console.log("number invalid");
-			console.log(numberRange);
-			console.log(input);
 		}
-	};
-
-	const addFoodToCart = (
-		orderNumber,
-		orderQuantity = 1,
-		listFood,
-		foodType
-	) => {
-		const food = listFood.find(food => food.id == orderNumber);
-		food.value = orderQuantity;
-
-		if (foodType === "main") setCart(cart, cart.main.push(food));
-		else if (foodType === "extras") setCart(cart, cart.extras.push(food));
-		else setCart(cart, cart.drinks.push(food));
-
-		console.log(cart);
-
-		setOrderNumber("");
-		setOrderQuantity("");
-		setStep(step + 1);
 	};
 
 	switch (step) {
 		case 1:
 			return (
 				<>
-					<Text>Pick ur main</Text>
-					<Table data={main} />
+					<Text>Hi {name} </Text>
+					<Text>List foods for today: </Text>
+					<Table data={foods} />
 					<Box>
-						<Box marginRight={1}>Pick number: </Box>
+						<Box marginRight={1}>Pick number and quantity: </Box>
 						<TextInput
-							value={orderNumber}
-							onChange={e => setOrderNumber(e)}
-							onSubmit={() => handleSubmitFoodName(main, orderNumber)}
+							value={order}
+							onChange={e => setOrder(e)}
+							onSubmit={() => handleSubmitFood(foods, order)}
 						/>
 					</Box>
 				</>
@@ -125,80 +77,20 @@ const MenuList = ({ list }) => {
 		case 2:
 			return (
 				<>
-					<Box>
-						<Box marginRight={1}>Quantity: </Box>
-						<TextInput
-							value={orderQuantity}
-							onChange={e => setOrderQuantity(e)}
-							onSubmit={() =>
-								addFoodToCart(orderNumber, orderQuantity, main, "main")
-							}
-						/>
-					</Box>
+					<Text>Do you want to choose other(y/n): </Text>
+					<TextInput
+						value=""
+						onChange={e => (e === "y" ? setStep(1) : setStep(step + 1))}
+					/>
 				</>
 			);
 		case 3:
 			return (
 				<>
-					<Text> Pick your extras</Text>
-					<Table data={extras} />
-					<Box>
-						<Box marginRight={1}>Pick number:</Box>
-						<TextInput
-							value={orderNumber}
-							onChange={e => setOrderNumber(e)}
-							onSubmit={() => handleSubmitFoodName(extras, orderNumber)}
-						/>
-					</Box>
+					<Text>Done. Thank you and have a nice day !!! </Text>
+					<Text> cart ne {cart} </Text>
 				</>
 			);
-		case 4:
-			return (
-				<>
-					<Box>
-						<Box marginRight={1}>Quantity: </Box>
-						<TextInput
-							value={orderQuantity}
-							onChange={e => setOrderQuantity(e)}
-							onSubmit={() =>
-								addFoodToCart(orderNumber, orderQuantity, extras, "extras")
-							}
-						/>
-					</Box>
-				</>
-			);
-		case 5:
-			return (
-				<>
-					<Text> Pick your drinks: </Text>
-					<Table data={drinks} />
-					<Box>
-						<Box marginRight={1}>Pick number:</Box>
-						<TextInput
-							value={orderNumber}
-							onChange={e => setOrderNumber(e)}
-							onSubmit={() => handleSubmitFoodName(drinks, orderNumber)}
-						/>
-					</Box>
-				</>
-			);
-		case 6:
-			return (
-				<>
-					<Box>
-						<Box marginRight={1}>Quantity: </Box>
-						<TextInput
-							value={orderQuantity}
-							onChange={e => setOrderQuantity(e)}
-							onSubmit={() =>
-								addFoodToCart(orderNumber, orderQuantity, drinks, "drinks")
-							}
-						/>
-					</Box>
-				</>
-			);
-		case 7:
-			return <Text>Done</Text>;
 		default:
 			return (
 				<>
