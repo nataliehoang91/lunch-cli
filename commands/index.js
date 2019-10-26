@@ -14,11 +14,11 @@ const requestBody = {
 };
 
 var foodID = 1;
+var cart = Array(15).fill("");
 
 ///List all Menu for today
 const MenuList = ({ list }) => {
 	const [order, setOrder] = useState("");
-	const [cart, setCart] = useState([]);
 	const [name, setName] = useState("");
 	const [step, setStep] = useState(0);
 	const [listFood, setListFood] = useState({});
@@ -33,7 +33,7 @@ const MenuList = ({ list }) => {
 					.filter(item => item != "")
 					.map(item => ({ id: foodID++, name: item }))
 			);
-			setCart(Array(response.data.values[1].length).fill(""));
+			//Array(response.data.values[1].length).fill(""));
 		}
 		fetchData();
 	}, []);
@@ -45,7 +45,8 @@ const MenuList = ({ list }) => {
 			.map(i => parseInt(i));
 		const numberRange = data.map(food => food.id);
 		if (input === 0 || numberRange.includes(input[0])) {
-			setCart((cart[input[0]] = input[1]));
+			cart[0] = name;
+			cart[input[0]] = input[1];
 			setStep(step + 1);
 			setOrder("");
 		} else {
@@ -83,8 +84,8 @@ const MenuList = ({ list }) => {
 		case 3:
 			return (
 				<>
+					<Text>Order Succeed. Type anything to quit !!! </Text>
 					<Text>Done. Thank you and have a nice day !!! </Text>
-					<Text> cart ne {cart} </Text>
 				</>
 			);
 		default:
