@@ -43,15 +43,16 @@ const MenuList = ({ list }) => {
 	}, []);
 
 	const handleSubmitFood = (data, order) => {
+		console.log(cart);
 		const input = order
 			.trim()
 			.split(" ")
 			.map(i => parseInt(i));
 		const numberRange = data.map(food => food.id);
 		if (input === 0 || numberRange.includes(input[0])) {
-			setCart(([input[0]] = input[1]));
+			setCart((cart[input[0]] = input[1]));
 			setStep(step + 1);
-			//setOrder("");
+			setOrder("");
 		} else {
 			console.log("number invalid");
 		}
