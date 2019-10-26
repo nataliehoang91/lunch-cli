@@ -13,15 +13,7 @@ const requestBody = {
 	values: []
 };
 
-const foods = [
-	{ id: 1, name: "sườn non nướng sữa" },
-	{ id: 2, name: "Thịt kho trứng cút" },
-	{ id: 3, name: "thịt bò xào cải chua" },
-	{ id: 4, name: "sườn thêm" },
-	{ id: 5, name: "thịt kho thêm" },
-	{ id: 6, name: "bò thêm" },
-	{ id: 7, name: "Nuoc dua" }
-];
+var foodID = 1;
 
 ///List all Menu for today
 const MenuList = ({ list }) => {
@@ -36,14 +28,17 @@ const MenuList = ({ list }) => {
 			const response = await axios(
 				"https://sheets.googleapis.com/v4/spreadsheets/1ZjzZKCMOFp5YncC3yZLLwFW4sER6p5fkR0rA5KvhHrY/values/Sheet1?key=AIzaSyCccptxVWHp1Mf4BGCC33m1SzgwU14BRD4"
 			);
-			setListFood(response.data.values[1]);
+			setListFood(
+				response.data.values[1]
+					.filter(item => item != "")
+					.map(item => ({ id: foodID++, name: item }))
+			);
 			setCart(Array(response.data.values[1].length).fill(""));
 		}
 		fetchData();
 	}, []);
 
 	const handleSubmitFood = (data, order) => {
-		console.log(cart);
 		const input = order
 			.trim()
 			.split(" ")
@@ -64,13 +59,13 @@ const MenuList = ({ list }) => {
 				<>
 					<Text>Hi {name} </Text>
 					<Text>List foods for today: </Text>
-					<Table data={foods} />
+					<Table data={listFood} />
 					<Box>
 						<Box marginRight={1}>Pick number and quantity: </Box>
 						<TextInput
 							value={order}
 							onChange={e => setOrder(e)}
-							onSubmit={() => handleSubmitFood(foods, order)}
+							onSubmit={() => handleSubmitFood(listFood, order)}
 						/>
 					</Box>
 				</>
