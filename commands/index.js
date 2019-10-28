@@ -54,6 +54,26 @@ const MenuList = ({ list }) => {
 		}
 	};
 
+	const postData = (data) => {
+		axios.PUT("https://sheets.googleapis.com/v4/spreadsheets/1ZjzZKCMOFp5YncC3yZLLwFW4sER6p5fkR0rA5KvhHrY/values/Sheet1?valueInputOption=RAW", {
+				headers: [{
+				key:"Content-Type",
+				value:"application/json",
+				description:""
+				},
+				{
+				key:"Authorization",
+				value:"ya29.ImCpB60wV3E1kUPn7MLaa6WY546MrFIID7ImVM8NVmMqjsOj83Tdutg0I0ydCR8-5ATDMWc4LYZJGCGlL9g2x3PlboGoWMDYFDRoxzPeARYHLIQU-cSq3Y9wls4maBRiRDw",
+				description:""
+				}],
+			body:JSON.stringify({
+				range: "Sheet1",
+				majorDimension: "ROWS",
+				value:data
+				})
+		})
+		};
+
 	switch (step) {
 		case 1:
 			return (
@@ -85,7 +105,7 @@ const MenuList = ({ list }) => {
 			return (
 				<>
 					<Text>Order Succeed. Type anything to quit !!! </Text>
-					<Text>Done. Thank you and have a nice day !!! </Text>
+										<Text>Done. Thank you and have a nice day !!! </Text>
 				</>
 			);
 		default:

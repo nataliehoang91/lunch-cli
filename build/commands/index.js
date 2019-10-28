@@ -154,159 +154,86 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; if (obj != null) { var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-const foods = [{
-  name: "nguyen",
-  main: [{
-    name: "suon heo",
-    value: 3
-  }],
-  extras: [{
-    name: "suon bo",
-    value: 2
-  }],
-  drinks: [{
-    name: "nuoc dua",
-    value: 2
-  }]
-}];
-const main = [{
-  id: 1,
-  name: "sườn non nướng sữa"
-}, {
-  id: 2,
-  name: "Thịt kho trứng cút"
-}, {
-  id: 3,
-  name: "thịt bò xào cải chua"
-}];
-const extras = [{
-  id: 1,
-  name: "sườn thêm"
-}, {
-  id: 2,
-  name: "thịt kho thêm"
-}, {
-  id: 3,
-  name: "bò thêm"
-}];
-const drinks = [{
-  id: 1,
-  name: "Nuoc dua"
-}];
-var cartDefault = {
-  name: "",
-  main: [],
-  extras: [],
-  drinks: []
-}; ///List all Menu for today
+const requestBody = {
+  range: "Sheet1",
+  majorDimension: "ROWS",
+  values: []
+};
+var foodID = 1;
+var cart = Array(15).fill(""); ///List all Menu for today
 
 const MenuList = ({
   list
 }) => {
-  const [orderNumber, setOrderNumber] = (0, _react.useState)("");
-  const [orderQuantity, setOrderQuantity] = (0, _react.useState)("");
+  const [order, setOrder] = (0, _react.useState)("");
   const [name, setName] = (0, _react.useState)("");
   const [step, setStep] = (0, _react.useState)(0);
-  const [cart, setCart] = (0, _react.useState)(cartDefault);
   const [listFood, setListFood] = (0, _react.useState)({});
   (0, _react.useEffect)(() => {
     async function fetchData() {
-      // You can await here
-      const response = await (0, _axios.default)("https://sheets.googleapis.com/v4/spreadsheets/1ZjzZKCMOFp5YncC3yZLLwFW4sER6p5fkR0rA5KvhHrY/values/Sheet1?key=AIzaSyCccptxVWHp1Mf4BGCC33m1SzgwU14BRD4"); // ...
-
-      setListFood(response.data.values[1]);
+      const response = await (0, _axios.default)("https://sheets.googleapis.com/v4/spreadsheets/1ZjzZKCMOFp5YncC3yZLLwFW4sER6p5fkR0rA5KvhHrY/values/Sheet1?key=AIzaSyCccptxVWHp1Mf4BGCC33m1SzgwU14BRD4");
+      setListFood(response.data.values[1].filter(item => item != "").map(item => ({
+        id: foodID++,
+        name: item
+      }))); //Array(response.data.values[1].length).fill(""));
     }
 
     fetchData();
   }, []);
 
-  const handleSubmitFoodName = (data, orderNumber) => {
-    const input = parseInt(orderNumber);
-    console.log(orderNumber);
+  const handleSubmitFood = (data, order) => {
+    const input = order.trim().split(" ").map(i => parseInt(i));
     const numberRange = data.map(food => food.id);
 
-    if (input === 0 || numberRange.includes(input)) {
+    if (input === 0 || numberRange.includes(input[0])) {
+      cart[0] = name;
+      cart[input[0]] = input[1];
       setStep(step + 1);
+      setOrder("");
     } else {
       console.log("number invalid");
-      console.log(numberRange);
-      console.log(input);
     }
   };
 
-  const addFoodToCart = (orderNumber, orderQuantity = 1, listFood, foodType) => {
-    const food = listFood.find(food => food.id == orderNumber);
-    food.value = orderQuantity;
-    if (foodType === "main") setCart(cart, cart.main.push(food));else if (foodType === "extras") setCart(cart, cart.extras.push(food));else setCart(cart, cart.drinks.push(food));
-    console.log(cart);
-    setOrderNumber("");
-    setOrderQuantity("");
-    setStep(step + 1);
+  const postData = data => {
+    _axios.default.PUT("https://sheets.googleapis.com/v4/spreadsheets/1ZjzZKCMOFp5YncC3yZLLwFW4sER6p5fkR0rA5KvhHrY/values/Sheet1?valueInputOption=RAW", {
+      headers: [{
+        key: "Content-Type",
+        value: "application/json",
+        description: ""
+      }, {
+        key: "Authorization",
+        value: "ya29.ImCpB60wV3E1kUPn7MLaa6WY546MrFIID7ImVM8NVmMqjsOj83Tdutg0I0ydCR8-5ATDMWc4LYZJGCGlL9g2x3PlboGoWMDYFDRoxzPeARYHLIQU-cSq3Y9wls4maBRiRDw",
+        description: ""
+      }],
+      body: JSON.stringify({
+        range: "Sheet1",
+        majorDimension: "ROWS",
+        value: data
+      })
+    });
   };
 
   switch (step) {
     case 1:
-      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, "Pick ur main"), _react.default.createElement(_inkTable.default, {
-        data: main
+      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, "Hi ", name, " "), _react.default.createElement(_ink.Text, null, "List foods for today: "), _react.default.createElement(_inkTable.default, {
+        data: listFood
       }), _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
         marginRight: 1
-      }, "Pick number: "), _react.default.createElement(_inkTextInput.default, {
-        value: orderNumber,
-        onChange: e => setOrderNumber(e),
-        onSubmit: () => handleSubmitFoodName(main, orderNumber)
+      }, "Pick number and quantity: "), _react.default.createElement(_inkTextInput.default, {
+        value: order,
+        onChange: e => setOrder(e),
+        onSubmit: () => handleSubmitFood(listFood, order)
       })));
 
     case 2:
-      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
-        marginRight: 1
-      }, "Quantity: "), _react.default.createElement(_inkTextInput.default, {
-        value: orderQuantity,
-        onChange: e => setOrderQuantity(e),
-        onSubmit: () => addFoodToCart(orderNumber, orderQuantity, main, "main")
-      })));
+      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, "Do you want to choose other(y/n): "), _react.default.createElement(_inkTextInput.default, {
+        value: "",
+        onChange: e => e === "y" ? setStep(1) : setStep(step + 1)
+      }));
 
     case 3:
-      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, " Pick your extras"), _react.default.createElement(_inkTable.default, {
-        data: extras
-      }), _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
-        marginRight: 1
-      }, "Pick number:"), _react.default.createElement(_inkTextInput.default, {
-        value: orderNumber,
-        onChange: e => setOrderNumber(e),
-        onSubmit: () => handleSubmitFoodName(extras, orderNumber)
-      })));
-
-    case 4:
-      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
-        marginRight: 1
-      }, "Quantity: "), _react.default.createElement(_inkTextInput.default, {
-        value: orderQuantity,
-        onChange: e => setOrderQuantity(e),
-        onSubmit: () => addFoodToCart(orderNumber, orderQuantity, extras, "extras")
-      })));
-
-    case 5:
-      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, " Pick your drinks: "), _react.default.createElement(_inkTable.default, {
-        data: drinks
-      }), _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
-        marginRight: 1
-      }, "Pick number:"), _react.default.createElement(_inkTextInput.default, {
-        value: orderNumber,
-        onChange: e => setOrderNumber(e),
-        onSubmit: () => handleSubmitFoodName(drinks, orderNumber)
-      })));
-
-    case 6:
-      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
-        marginRight: 1
-      }, "Quantity: "), _react.default.createElement(_inkTextInput.default, {
-        value: orderQuantity,
-        onChange: e => setOrderQuantity(e),
-        onSubmit: () => addFoodToCart(orderNumber, orderQuantity, drinks, "drinks")
-      })));
-
-    case 7:
-      return _react.default.createElement(_ink.Text, null, "Done");
+      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, "Order Succeed. Type anything to quit !!! "), _react.default.createElement(_ink.Text, null, "Done. Thank you and have a nice day !!! "));
 
     default:
       return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Box, {
