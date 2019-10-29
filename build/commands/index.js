@@ -117,7 +117,16 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"index.js":[function(require,module,exports) {
+})({"../configs/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.API_KEY = void 0;
+const API_KEY = "AIzaSyCccptxVWHp1Mf4BGCC33m1SzgwU14BRD4";
+exports.API_KEY = API_KEY;
+},{}],"index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -133,7 +142,11 @@ var _ink = require("ink");
 
 var _inkTable = _interopRequireDefault(require("ink-table"));
 
+var _axios = _interopRequireDefault(require("axios"));
+
 var _inkTextInput = _interopRequireDefault(require("ink-text-input"));
+
+var _configs = require("../configs");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -141,121 +154,86 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; if (obj != null) { var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-const main = [{
-  id: 1,
-  name: "sườn non nướng sữa"
-}, {
-  id: 2,
-  name: "Thịt kho trứng cút"
-}, {
-  id: 3,
-  name: "thịt bò xào cải chua"
-}];
-const foods = [{
-  name: "nguyen",
-  main: [{
-    name: "suon heo",
-    value: 3
-  }],
-  extras: [{
-    name: "suon bo",
-    value: 2
-  }],
-  drinks: [{
-    name: "nuoc dua",
-    value: 2
-  }]
-}];
-const extras = [{
-  id: 1,
-  name: "sườn thêm"
-}, {
-  id: 2,
-  name: "thịt kho thêm"
-}, {
-  id: 3,
-  name: "bò thêm"
-}];
-const drinks = [{
-  id: 1,
-  name: "Nuoc dua"
-}]; ///List all Menu for today
+const requestBody = {
+  range: "Sheet1",
+  majorDimension: "ROWS",
+  values: []
+};
+var foodID = 1;
+var cart = Array(15).fill(""); ///List all Menu for today
 
 const MenuList = ({
   list
 }) => {
-  const [orderNumber, setOrderNumber] = (0, _react.useState)("");
-  const [orderQuantity, setOrderQuantity] = (0, _react.useState)("");
+  const [order, setOrder] = (0, _react.useState)("");
   const [name, setName] = (0, _react.useState)("");
   const [step, setStep] = (0, _react.useState)(0);
-  const [cart, setCart] = (0, _react.useState)([]);
+  const [listFood, setListFood] = (0, _react.useState)({});
+  (0, _react.useEffect)(() => {
+    async function fetchData() {
+      const response = await (0, _axios.default)("https://sheets.googleapis.com/v4/spreadsheets/1ZjzZKCMOFp5YncC3yZLLwFW4sER6p5fkR0rA5KvhHrY/values/Sheet1?key=AIzaSyCccptxVWHp1Mf4BGCC33m1SzgwU14BRD4");
+      setListFood(response.data.values[1].filter(item => item != "").map(item => ({
+        id: foodID++,
+        name: item
+      }))); //Array(response.data.values[1].length).fill(""));
+    }
 
-  const handleSubmitFoodName = (data, n) => {
-    const input = parseInt(n);
-    const numberRange = data.map(i => i.id);
+    fetchData();
+  }, []);
 
-    if (input === 0 || numberRange.includes(input)) {
-      console.log("Going to next step " + (step + 1));
+  const handleSubmitFood = (data, order) => {
+    const input = order.trim().split(" ").map(i => parseInt(i));
+    const numberRange = data.map(food => food.id);
+
+    if (input === 0 || numberRange.includes(input[0])) {
+      cart[0] = name;
+      cart[input[0]] = input[1];
       setStep(step + 1);
-      setOrderNumber("");
+      setOrder("");
     } else {
       console.log("number invalid");
-      console.log(numberRange);
-      console.log(input);
     }
   };
 
-  const handleSubmitQuantity = (data, n) => {
-    const input = parseInt(n);
-    const numberRange = data.map(i => i.id);
-    console.log("Going to next step " + (step + 1));
-    setStep(step + 1);
-    setOrderNumber("");
+  const postData = data => {
+    _axios.default.PUT("https://sheets.googleapis.com/v4/spreadsheets/1ZjzZKCMOFp5YncC3yZLLwFW4sER6p5fkR0rA5KvhHrY/values/Sheet1?valueInputOption=RAW", {
+      headers: [{
+        key: "Content-Type",
+        value: "application/json",
+        description: ""
+      }, {
+        key: "Authorization",
+        value: "ya29.ImCpB60wV3E1kUPn7MLaa6WY546MrFIID7ImVM8NVmMqjsOj83Tdutg0I0ydCR8-5ATDMWc4LYZJGCGlL9g2x3PlboGoWMDYFDRoxzPeARYHLIQU-cSq3Y9wls4maBRiRDw",
+        description: ""
+      }],
+      body: JSON.stringify({
+        range: "Sheet1",
+        majorDimension: "ROWS",
+        value: data
+      })
+    });
   };
 
   switch (step) {
     case 1:
-      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, "Pick ur main"), _react.default.createElement(_inkTable.default, {
-        data: main
+      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, "Hi ", name, " "), _react.default.createElement(_ink.Text, null, "List foods for today: "), _react.default.createElement(_inkTable.default, {
+        data: listFood
       }), _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
         marginRight: 1
-      }, "Pick number:"), _react.default.createElement(_inkTextInput.default, {
-        value: orderNumber,
-        onChange: e => setOrderNumber(e),
-        onSubmit: () => handleSubmitFoodName(main, orderNumber)
+      }, "Pick number and quantity: "), _react.default.createElement(_inkTextInput.default, {
+        value: order,
+        onChange: e => setOrder(e),
+        onSubmit: () => handleSubmitFood(listFood, order)
       })));
 
     case 2:
-      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
-        marginRight: 1
-      }, "Quantity: "), _react.default.createElement(_inkTextInput.default, {
-        value: orderNumber,
-        onChange: e => setOrderNumber(e),
-        onSubmit: () => handleSubmitFoodName(main, orderNumber)
-      })));
+      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, "Do you want to choose other(y/n): "), _react.default.createElement(_inkTextInput.default, {
+        value: "",
+        onChange: e => e === "y" ? setStep(1) : setStep(step + 1)
+      }));
 
     case 3:
-      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, " Pick your extras"), _react.default.createElement(_inkTable.default, {
-        data: extras
-      }), _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
-        marginRight: 1
-      }, "Pick number:"), _react.default.createElement(_inkTextInput.default, {
-        value: orderNumber,
-        onChange: e => setOrderNumber(e),
-        onSubmit: () => handleSubmitFoodName(extras, orderNumber)
-      })));
-
-    case 4:
-      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Box, null, _react.default.createElement(_ink.Box, {
-        marginRight: 1
-      }, "Quantity: "), _react.default.createElement(_inkTextInput.default, {
-        value: orderNumber,
-        onChange: e => setOrderNumber(e),
-        onSubmit: () => handleSubmitFoodName(main, orderNumber)
-      })));
-
-    case 5:
-      return _react.default.createElement(_ink.Text, null, "Done");
+      return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Text, null, "Order Succeed. Type anything to quit !!! "), _react.default.createElement(_ink.Text, null, "Done. Thank you and have a nice day !!! "));
 
     default:
       return _react.default.createElement(_react.default.Fragment, null, _react.default.createElement(_ink.Box, {
@@ -270,5 +248,5 @@ const MenuList = ({
 
 var _default = MenuList;
 exports.default = _default;
-},{}]},{},["index.js"], null)
+},{"../configs":"../configs/index.js"}]},{},["index.js"], null)
 //# sourceMappingURL=/index.js.map
